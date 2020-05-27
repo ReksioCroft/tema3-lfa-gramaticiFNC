@@ -18,7 +18,7 @@ def eliminareLProductii( gramatica ):
                         else:
                             gramatica[ i ][ j ] = gramatica[ i ][ j ].replace( simbol, "" )
                             if len( gramatica[ i ][ j ] ) == 0:
-                                gramatica[ i ].pop( j )
+                                gramatica[ i ][j] = '$'
             else:
                 gramatica[ simbol ].pop( gramatica[ simbol ].index( '$' ) )
                 for i in gramatica:
@@ -26,8 +26,14 @@ def eliminareLProductii( gramatica ):
                         for j in range( len( gramatica[ i ] ) ):
                             if simbol in gramatica[ i ][ j ]:
                                 s = gramatica[ i ][ j ].replace( simbol, "" )
-                                if len( s ) > 0:
-                                    gramatica[ i ].append( gramatica[ i ][ j ].replace( simbol, "" ) )
+                                if len( s ) == 0:
+                                    s = '$'
+                                gramatica[ i ].append( s )
+    return gramatica
+
+
+def eliminareRedenumiri( gramatica ):
+
     return gramatica
 
 
@@ -40,3 +46,5 @@ print( gramatica )
 
 gramatica = eliminareLProductii( gramatica )
 print( gramatica )
+gramatica = eliminareRedenumiri( gramatica )
+print(gramatica)

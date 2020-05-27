@@ -1,3 +1,3 @@
-T    ->  $  |    ab
-A -> T
-B -> CT
+S->ASA|aB
+A->B|S
+B->b|$
