@@ -97,12 +97,12 @@ def addNeterminale( gramatica ):
                         return i
         return False
 
-    def potInlocui( i ):
-        for verifCuv in gramatica[ i ]:
+    def potInlocui( verifCuv ):
 
-            for verifLitera in verifCuv:
-                if verifLitera.isupper() == True:
-                    return True
+        for verifLitera in verifCuv:
+            if verifLitera.isupper() == True:
+                return True
+
         return False
 
     alfabetFolosit = set( gramatica )
@@ -115,11 +115,14 @@ def addNeterminale( gramatica ):
                     for pozLitera in range( len( j ) ):
                         if j[ pozLitera ].islower() == True:
 
-                            if potInlocui( i ) == False:  # inlocuiesc doar daca litera mica se afla langa o lutera mare
+                            if potInlocui( j ) == False:  # inlocuiesc doar daca litera mica se afla langa o lutera mare
                                 continue
                             verificare = verif( j[ pozLitera ] )
                             if verificare == False:
-                                lit = random.choice( list( alfabet - alfabetFolosit ) )
+                                if j[pozLitera] not in gramatica:
+                                    lit = j[pozLitera].upper()
+                                else:
+                                    lit = random.choice( list( alfabet - alfabetFolosit ) )
                                 gramatica[ lit ] = set( j[ pozLitera ] )
                                 s = j[ :pozLitera ] + lit + j[ pozLitera + 1: ]
                                 gramatica[ i ].remove( j )
@@ -138,7 +141,7 @@ def addNeterminale( gramatica ):
 def maximDouaProductii( gramatica ):
     def cautare( valCautata ):
         for i in gramatica:
-            if gramatica[ i ] == valCautata:
+            if len(gramatica[ i ])==1 and valCautata in gramatica[i]:
                 return i
         return False
 
@@ -149,21 +152,22 @@ def maximDouaProductii( gramatica ):
             for i in gramatica:
                 for j in gramatica[ i ]:
                     if len( j ) > 2:
-                        productii = list( gramatica[ i ] )
-                        gramatica[ i ].clear()
-                        gramatica[ i ].add( productii[ 0 ]  )
-                        nouSet = set( productii[ 1: ] )
-                        posibil = cautare( nouSet )
+                        productii = j
+                        gramatica[ i ].remove(j)
+                        vechiStr = productii[0]
+                        nouStr = productii[ 1: ]
+                        posibil = cautare( nouStr )
                         if posibil == False:
                             alfabetFolosit = set( gramatica )
                             litera = random.choice( list( alfabet - alfabetFolosit ) )
-                            gramatica[ litera ] = nouSet
-                            gramatica[ i ].add( litera )
+                            gramatica[ litera ] = { nouStr }
+                            gramatica[ i ].add( vechiStr+litera )
                         else:
-                            gramatica[ i ].add( posibil )
+                            gramatica[ i ].add( vechiStr+posibil )
         except RuntimeError:
             ok = True
     return gramatica
+
 
 fin = open( "date.in" )
 gramatica = dict()
