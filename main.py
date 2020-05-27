@@ -12,13 +12,16 @@ def eliminareLProductii( gramatica ):
             if len( gramatica[ simbol ] ) == 1:
                 gramatica.pop( simbol, None )
                 for i in gramatica:
-                    for j in range( len( gramatica[ i ] ) ):
-                        if gramatica[ i ][ j ] == simbol:  # daca apare doar simbolul, in inlocuim cu lambda
-                            gramatica[ i ][ j ] = '$'
+                    for j in gramatica[ i ]:
+                        if j == simbol:  # daca apare doar simbolul, in inlocuim cu lambda
+                            gramatica[ i ].remove( simbol )
+                            gramatica[ i ].add( '$' )
                         else:  # altfel il eliminam
-                            gramatica[ i ][ j ] = gramatica[ i ][ j ].replace( simbol, "" )
-                            if len( gramatica[ i ][ j ] ) == 0:
-                                gramatica[ i ][ j ] = '$'
+                            s = j.replace( simbol, "" )
+                            if len( s ) == 0:
+                                s = '$'
+                            gramatica[ i ].remove( j )
+                            gramatica[ i ].add( s )
             else:
                 gramatica[ simbol ].remove( '$' )
                 for i in gramatica:
@@ -61,10 +64,9 @@ def eliminareInutile( gramatica ):
         def dfs( neterminal ):
             vizitate[ neterminal ] = True
             for i in gramatica[ neterminal ]:
-                for j in gramatica[ i ]:
-                    for litera in j:
-                        if j.isupper() == True and vizitate[ j ] == False:
-                            dfs( j )
+                for litera in i:
+                    if litera.isupper() == True and vizitate[ litera ] == False:
+                        dfs( litera )
 
         vizitate = { x: False for x in gramatica }
         dfs( 'S' )
@@ -81,6 +83,52 @@ def eliminareInutile( gramatica ):
 
 
 def addNeterminale( gramatica ):
+    def verif( litera ):  # verific daca exista un neterminal care are ca produs o unica litera
+        for i in gramatica:
+            if len( gramatica[ i ] ) == 1:
+                for cuv in gramatica[ i ]:
+                    if cuv == litera:
+                        return i
+        return False
+
+    def potInlocui( i ):
+        for verifCuv in gramatica[ i ]:
+
+            for verifLitera in verifCuv:
+                if verifLitera.isupper() == True:
+                    return True
+        return False
+
+    import random
+    alfabet = { 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U',
+                'V', 'W', 'X', 'Y', 'Z' }
+    alfabetFolosit = set( gramatica )
+    ok = True
+    while ok == True:  # cat timp se modifica dictionarul, trb sa am grija la exceptie
+        ok = False
+        try:
+            for i in gramatica:
+                for j in gramatica[ i ]:
+                    for pozLitera in range( len( j ) ):
+                        if j[ pozLitera ].islower() == True:
+
+                            if potInlocui(i) == False: # inlocuiesc doar daca litera mica se afla langa o lutera mare
+                                continue
+                            verificare = verif( j[ pozLitera ] )
+                            if verificare == False:
+                                lit = random.choice( list( alfabet - alfabetFolosit ) )
+                                gramatica[ lit ] = set( j[ pozLitera ] )
+                                s = j[ :pozLitera ] + lit + j[ pozLitera + 1: ]
+                                gramatica[ i ].remove( j )
+                                gramatica[ i ].add( s )
+                                alfabetFolosit.add( lit )
+                            else:
+                                s = j[ :pozLitera ] + verificare + j[ pozLitera + 1: ]
+                                gramatica[ i ].remove( j )
+                                gramatica[ i ].add( s )
+        except RuntimeError:
+            ok = True
+
     return gramatica
 
 
