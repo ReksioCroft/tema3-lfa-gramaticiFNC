@@ -1,4 +1,4 @@
-S->ASA|aB
-A->B|S
-B->b|$
-C->$
+S -> XXY | Y | a
+X -> S | c | $
+Y -> XY | Yb |  a | b
+Z -> a | b | c

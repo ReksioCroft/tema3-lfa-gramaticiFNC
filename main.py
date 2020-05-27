@@ -1,3 +1,9 @@
+import random
+
+alfabet = { 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U',
+            'V', 'W', 'X', 'Y', 'Z' }
+
+
 def eliminareLProductii( gramatica ):
     ok = 0
     while ok == 0:
@@ -99,9 +105,6 @@ def addNeterminale( gramatica ):
                     return True
         return False
 
-    import random
-    alfabet = { 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U',
-                'V', 'W', 'X', 'Y', 'Z' }
     alfabetFolosit = set( gramatica )
     ok = True
     while ok == True:  # cat timp se modifica dictionarul, trb sa am grija la exceptie
@@ -112,7 +115,7 @@ def addNeterminale( gramatica ):
                     for pozLitera in range( len( j ) ):
                         if j[ pozLitera ].islower() == True:
 
-                            if potInlocui(i) == False: # inlocuiesc doar daca litera mica se afla langa o lutera mare
+                            if potInlocui( i ) == False:  # inlocuiesc doar daca litera mica se afla langa o lutera mare
                                 continue
                             verificare = verif( j[ pozLitera ] )
                             if verificare == False:
@@ -132,6 +135,36 @@ def addNeterminale( gramatica ):
     return gramatica
 
 
+def maximDouaProductii( gramatica ):
+    def cautare( valCautata ):
+        for i in gramatica:
+            if gramatica[ i ] == valCautata:
+                return i
+        return False
+
+    ok = True
+    while ok == True:
+        ok = False
+        try:
+            for i in gramatica:
+                for j in gramatica[ i ]:
+                    if len( j ) > 2:
+                        productii = list( gramatica[ i ] )
+                        gramatica[ i ].clear()
+                        gramatica[ i ].add( productii[ 0 ]  )
+                        nouSet = set( productii[ 1: ] )
+                        posibil = cautare( nouSet )
+                        if posibil == False:
+                            alfabetFolosit = set( gramatica )
+                            litera = random.choice( list( alfabet - alfabetFolosit ) )
+                            gramatica[ litera ] = nouSet
+                            gramatica[ i ].add( litera )
+                        else:
+                            gramatica[ i ].add( posibil )
+        except RuntimeError:
+            ok = True
+    return gramatica
+
 fin = open( "date.in" )
 gramatica = dict()
 for i in fin:
@@ -146,4 +179,6 @@ print( gramatica )
 gramatica = eliminareInutile( gramatica )
 print( gramatica )
 gramatica = addNeterminale( gramatica )
+print( gramatica )
+gramatica = maximDouaProductii( gramatica )
 print( gramatica )
