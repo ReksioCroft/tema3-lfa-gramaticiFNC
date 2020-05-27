@@ -18,22 +18,33 @@ def eliminareLProductii( gramatica ):
                         else:
                             gramatica[ i ][ j ] = gramatica[ i ][ j ].replace( simbol, "" )
                             if len( gramatica[ i ][ j ] ) == 0:
-                                gramatica[ i ][j] = '$'
+                                gramatica[ i ][ j ] = '$'
             else:
-                gramatica[ simbol ].pop( gramatica[ simbol ].index( '$' ) )
+                gramatica[ simbol ].remove( '$' )
                 for i in gramatica:
                     if i != simbol:
-                        for j in range( len( gramatica[ i ] ) ):
-                            if simbol in gramatica[ i ][ j ]:
-                                s = gramatica[ i ][ j ].replace( simbol, "" )
+                        for j in gramatica[ i ]:
+                            if '$' in j:
+                                s = [ j ].replace( simbol, "" )
                                 if len( s ) == 0:
                                     s = '$'
-                                gramatica[ i ].append( s )
+                                gramatica[ i ].pop( j )
+                                gramatica[ i ].insert( s )
     return gramatica
 
 
 def eliminareRedenumiri( gramatica ):
-
+    for i in gramatica:
+        ok = 1
+        while ok == 1:  # cat timp set-ul curent din dict se modifica
+            ok = 0
+            try:  # daca se modifica set-ul curent,e aruncata exceptie
+                for j in gramatica[ i ]:
+                    if len( j ) == 1 and j.isupper() == True:
+                        gramatica[ i ].update( gramatica[ j ] )
+                        gramatica[ i ].remove( j )
+            except RuntimeError:
+                ok = 1
     return gramatica
 
 
@@ -41,10 +52,10 @@ fin = open( "date.in" )
 gramatica = dict()
 for i in fin:
     l = i.split( "->" )
-    gramatica[ l[ 0 ].strip() ] = [ x.strip( "|" ) for x in l[ 1 ].replace( "|", " " ).split() ]
+    gramatica[ l[ 0 ].strip() ] = set( [ x.strip( "|" ) for x in l[ 1 ].replace( "|", " " ).split() ] )
 print( gramatica )
 
 gramatica = eliminareLProductii( gramatica )
 print( gramatica )
 gramatica = eliminareRedenumiri( gramatica )
-print(gramatica)
+print( gramatica )
