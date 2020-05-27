@@ -13,9 +13,9 @@ def eliminareLProductii( gramatica ):
                 gramatica.pop( simbol, None )
                 for i in gramatica:
                     for j in range( len( gramatica[ i ] ) ):
-                        if gramatica[ i ][ j ] == simbol:
+                        if gramatica[ i ][ j ] == simbol:  # daca apare doar simbolul, in inlocuim cu lambda
                             gramatica[ i ][ j ] = '$'
-                        else:
+                        else:  # altfel il eliminam
                             gramatica[ i ][ j ] = gramatica[ i ][ j ].replace( simbol, "" )
                             if len( gramatica[ i ][ j ] ) == 0:
                                 gramatica[ i ][ j ] = '$'
@@ -23,13 +23,20 @@ def eliminareLProductii( gramatica ):
                 gramatica[ simbol ].remove( '$' )
                 for i in gramatica:
                     if i != simbol:
-                        for j in gramatica[ i ]:
-                            if '$' in j:
-                                s = [ j ].replace( simbol, "" )
-                                if len( s ) == 0:
-                                    s = '$'
-                                gramatica[ i ].pop( j )
-                                gramatica[ i ].insert( s )
+                        ok = True
+                        while ok:  # cat timp set-ul se modifica
+                            ok = False
+                            try:
+                                for j in gramatica[ i ]:
+                                    if simbol in j:
+                                        for litera in range( len( j ) ):
+                                            if j[ litera ] == simbol:
+                                                cuvNou = j[ :litera ] + j[ litera + 1: ]
+                                                if cuvNou == "":
+                                                    cuvNou = "$"
+                                                gramatica[ i ].add( cuvNou )
+                            except RuntimeError:
+                                ok = True
     return gramatica
 
 
@@ -48,6 +55,10 @@ def eliminareRedenumiri( gramatica ):
     return gramatica
 
 
+def eliminareInutile( gramatica ):
+    return gramatica
+
+
 fin = open( "date.in" )
 gramatica = dict()
 for i in fin:
@@ -58,4 +69,6 @@ print( gramatica )
 gramatica = eliminareLProductii( gramatica )
 print( gramatica )
 gramatica = eliminareRedenumiri( gramatica )
+print( gramatica )
+gramatica = eliminareInutile( gramatica )
 print( gramatica )
