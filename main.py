@@ -56,6 +56,31 @@ def eliminareRedenumiri( gramatica ):
 
 
 def eliminareInutile( gramatica ):
+    def inaccesibil():
+
+        def dfs( neterminal ):
+            vizitate[ neterminal ] = True
+            for i in gramatica[ neterminal ]:
+                for j in gramatica[ i ]:
+                    for litera in j:
+                        if j.isupper() == True and vizitate[ j ] == False:
+                            dfs( j )
+
+        vizitate = { x: False for x in gramatica }
+        dfs( 'S' )
+        for i in vizitate:
+            if vizitate[ i ] == False:
+                gramatica.pop( i, None )
+
+    def neterminate():
+        eliminate = set()
+
+    inaccesibil()  # eliminam starile inaccesibile
+    neterminate()  # eliminam starile ce nu se termina
+    return gramatica
+
+
+def addNeterminale( gramatica ):
     return gramatica
 
 
@@ -71,4 +96,6 @@ print( gramatica )
 gramatica = eliminareRedenumiri( gramatica )
 print( gramatica )
 gramatica = eliminareInutile( gramatica )
+print( gramatica )
+gramatica = addNeterminale( gramatica )
 print( gramatica )
