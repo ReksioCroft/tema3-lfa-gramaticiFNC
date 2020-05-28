@@ -119,7 +119,7 @@ def addNeterminale( gramatica ):
                                 continue
                             verificare = verif( j[ pozLitera ] )
                             if verificare == False:
-                                if j[pozLitera] not in gramatica:
+                                if j[pozLitera].upper() not in gramatica:
                                     lit = j[pozLitera].upper()
                                 else:
                                     lit = random.choice( list( alfabet - alfabetFolosit ) )
