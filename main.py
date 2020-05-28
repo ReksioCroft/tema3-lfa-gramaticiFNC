@@ -65,8 +65,7 @@ def eliminareRedenumiri( gramatica ):
 
 
 def eliminareInutile( gramatica ):
-    def inaccesibil():
-
+    def stariAccesibile():
         def dfs( neterminal ):
             vizitate[ neterminal ] = True
             for i in gramatica[ neterminal ]:
@@ -75,16 +74,53 @@ def eliminareInutile( gramatica ):
                         dfs( litera )
 
         vizitate = { x: False for x in gramatica }
-        dfs( 'S' )
-        for i in vizitate:
+        dfs( 'S' )  # marcam starile din care ajungem din punctul de plecare
+        for i in vizitate:  # scoatem afara starile pe care nu le mai avem
             if vizitate[ i ] == False:
                 gramatica.pop( i, None )
 
-    def neterminate():
-        eliminate = set()
+    def stariInfinite():
+        aux = set()
+        for i in gramatica:  # marcam starile care merg si in alte stari
+            ok = True
+            while ok == True:
+                ok = False
+                try:
+                    for j in gramatica[ i ]:
+                        if len( gramatica[ i ] ) == 1 and i in j:
+                            s = j.replace( i, "" )
+                            if len( s ) > 0:
+                                for lit in s:
+                                    if lit.isupper() == True and lit != i:
+                                        break
+                                else:
+                                    gramatica[ i ].remove( j )
+                                    if len( gramatica[ i ] ) == 0:
+                                        aux.add( i )
+                            else:
+                                if len( gramatica[ i ] ) == 0:
+                                    aux.add( gramatica[ i ] )
+                except RuntimeError:
+                    ok = True
+        for i in aux:  # scoatem afara starile pe care nu le mai avem
+            gramatica.pop( i, None )
+        # reparam dictionaul
+        ok = True
+        while ok == True:
+            ok = False
+            try:
+                for i in gramatica:
+                    for j in gramatica[ i ]:
+                        for lit in j:
+                            if lit in aux:
+                                gramatica[ i ].remove( j )
+                                break
+            except RuntimeError:
+                ok = True
 
-    inaccesibil()  # eliminam starile inaccesibile
-    neterminate()  # eliminam starile ce nu se termina
+    stariInfinite()
+    stariAccesibile()
+
     return gramatica
 
 
@@ -119,8 +155,8 @@ def addNeterminale( gramatica ):
                                 continue
                             verificare = verif( j[ pozLitera ] )
                             if verificare == False:
-                                if j[pozLitera].upper() not in gramatica:
-                                    lit = j[pozLitera].upper()
+                                if j[ pozLitera ].upper() not in gramatica:
+                                    lit = j[ pozLitera ].upper()
                                 else:
                                     lit = random.choice( list( alfabet - alfabetFolosit ) )
                                 gramatica[ lit ] = set( j[ pozLitera ] )
@@ -141,7 +177,7 @@ def addNeterminale( gramatica ):
 def maximDouaProductii( gramatica ):
     def cautare( valCautata ):
         for i in gramatica:
-            if len(gramatica[ i ])==1 and valCautata in gramatica[i]:
+            if len( gramatica[ i ] ) == 1 and valCautata in gramatica[ i ]:
                 return i
         return False
 
@@ -153,17 +189,17 @@ def maximDouaProductii( gramatica ):
                 for j in gramatica[ i ]:
                     if len( j ) > 2:
                         productii = j
-                        gramatica[ i ].remove(j)
-                        vechiStr = productii[0]
+                        gramatica[ i ].remove( j )
+                        vechiStr = productii[ 0 ]
                         nouStr = productii[ 1: ]
                         posibil = cautare( nouStr )
                         if posibil == False:
                             alfabetFolosit = set( gramatica )
                             litera = random.choice( list( alfabet - alfabetFolosit ) )
                             gramatica[ litera ] = { nouStr }
-                            gramatica[ i ].add( vechiStr+litera )
+                            gramatica[ i ].add( vechiStr + litera )
                         else:
-                            gramatica[ i ].add( vechiStr+posibil )
+                            gramatica[ i ].add( vechiStr + posibil )
         except RuntimeError:
             ok = True
     return gramatica
